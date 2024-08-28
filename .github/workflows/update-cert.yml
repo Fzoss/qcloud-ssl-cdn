@@ -33,15 +33,8 @@ jobs:
         run: sh ./docker/update.sh
 
       - name: Notification
-        uses: monlor/bark-action@v3
-        if: always()
-        with:
-          host: ${{ secrets.BARK_HOST}} # not required
-          key: ${{ secrets.BARK_KEY }}   # Your secret key
-          title: Github Actions
-          body: 'Your tencent cdn certs update ${{ job.status }}！'
-          isArchive: 1
-          url: 'github://github.com/${{ github.repository }}'
-          group: Github
-          icon: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-          copy: ${{ steps.meta.outputs.tags }}
+        env:
+          TG_BOT_SECRET: ${{ secrets.TG_BOT_SECRET }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          ACME_DOMAIN: ${{ secrets.ACME_DOMAIN }}
+        run: curl -w "%{remote_ip} %{http_code}" -o /dev/null -s 'https://api.telegram.org/$TG_BOT_SECRET/sendMessage?chat_id=$TG_CHAT_ID&text=自动腾讯cdn证书更新：$ACME_DOMAIN，完成！'
